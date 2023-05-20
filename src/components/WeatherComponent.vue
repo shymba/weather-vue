@@ -36,30 +36,42 @@
 <!--          <p class="text" v-else>*The list is empty, please select a city from the dropdown list</p>-->
         </table>
       </div>
+      <BarChart
+          :cityCoord="cityCoord"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import ApiService from "@/modules/apiService";
+import BarChart from "@/components/BarChart";
 
 const apiCityWeather = new ApiService()
 
 export default {
   name: 'WeatherComponent',
+  components: { BarChart },
   data() {
     return {
       cities: null,
       inputCityName: null,
       cityData: null,
-      cityListData: []
+      HourlyForecast: null,
+      cityListData: [],
+      cityID: Number,
+      cityCoord: []
     }
   },
   methods: {
     async getCity(cityName) {
       const city = this.cities.find((city) => city.name === cityName)
-      console.log('getCity: ', city.lat, city.lon)
+      // console.log('getCity: ', city.lat, city.lon)
+
       this.cityData = await apiCityWeather.getOneCity(city.lat, city.lon)
+      console.log(this.cityData);
+
+      this.cityCoord.push(city.lat, city.lon)
       this.cityListData.push({
         name: this.cityData.name,
         feels_like: this.cityData.main.feels_like,
@@ -81,14 +93,6 @@ export default {
       this.cities = await apiCityWeather.getCitiesList(this.inputCityName);
     },
   },
-  // watch: {
-  //   cityNames: {
-  //     deep: true,
-  //     async handler(newVal) {
-  //       console.log('handler');
-  //     }
-  //   }
-  // }
 }
 </script>
 
