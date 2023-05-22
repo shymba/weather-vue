@@ -16,28 +16,13 @@
           <option
               v-for="city in cities"
               :key="city.lat"
-              :value="city.name"
-          />
+          >{{city.name}}, {{city.country}}</option>
         </datalist>
       </form>
-      <div class="table">
-        <table id="weather">
-          <tr>
-            <th>City</th>
-            <th>feels_like</th>
-            <th>temp</th>
-          </tr>
-          <tr class="content" v-for="city in cityListData" :key="city.id">
-            <td>{{ city.name }}</td>
-            <td>{{ city.feels_like }}</td>
-            <td>{{ city.temp }}</td>
-<!--            <span class="trash" @click="removeCity(city.id)"><i class="far fa-trash-alt"></i></span>-->
-          </tr>
-<!--          <p class="text" v-else>*The list is empty, please select a city from the dropdown list</p>-->
-        </table>
-      </div>
-      <BarChart
-          :cityCoord="cityCoord"
+
+      <CityList
+          :cityData="cityData"
+          :cityWeather="cityWeather.list"
       />
     </div>
   </div>
@@ -45,42 +30,48 @@
 
 <script>
 import ApiService from "@/modules/apiService";
-import BarChart from "@/components/BarChart";
+import MyChart from "@/components/MyChart";
+import CityList from "@/components/CityList";
 
 const apiCityWeather = new ApiService()
 
 export default {
   name: 'WeatherComponent',
-  components: { BarChart },
+  components: { MyChart, CityList },
   data() {
     return {
       cities: null,
       inputCityName: null,
-      cityData: null,
+      cityData: [],
       HourlyForecast: null,
       cityListData: [],
       cityID: Number,
-      cityCoord: []
+      cityWeather: [
+          {
+            dt_txt: "2023-05-22 21:00:00",
+            main: { temp: 14.34 }
+          }
+          ]
     }
   },
   methods: {
     async getCity(cityName) {
-      const city = this.cities.find((city) => city.name === cityName)
-      // console.log('getCity: ', city.lat, city.lon)
+      const cityInp = cityName.split(', ');
+      const city = this.cities.find((city) => {
+        return city.name === cityInp[0] && city.country === cityInp[1]
+      });
 
-      this.cityData = await apiCityWeather.getOneCity(city.lat, city.lon)
-      console.log(this.cityData);
-
-      this.cityCoord.push(city.lat, city.lon)
-      this.cityListData.push({
-        name: this.cityData.name,
-        feels_like: this.cityData.main.feels_like,
-        temp: this.cityData.main.temp,
-        id: this.cityData.id
-      })
-      this.cities = null;
+      const apiData = await apiCityWeather.getOneCity(city.lat, city.lon)
+      this.cityData.push(
+          {
+            name: apiData.name,
+            temp: apiData.main.temp,
+            feels: apiData.main.feels_like,
+            id: apiData.id
+          }
+      )
       this.inputCityName = null;
-
+      this.cityWeather = await apiCityWeather.getHourlyForecastData(city.lat, city.lon);
     },
     changeCity(e) {
         if(!e.inputType) {
@@ -108,44 +99,33 @@ $hover-basket-color: #CC0022;
   margin-bottom: 30px;
 }
 
-input {
-  margin: 25px;
+form input {
+  border: 0;
+  border-radius: 50px;
+  font-size: 16px;
+  padding: 15px 30px;
+  width: 30%;
+}
+
+input:focus {
+  outline: none;
 }
 
 h3 {
   color: white;
 }
 
-.table {
-  width: 100%;
-  border-radius: 5px;
+.card {
+  margin: auto;
+  width: 600px;
+  color: #FFFFFF;
 }
 
-#weather {
-  border-collapse: collapse;
-  width: 100%;
-  color: $white-color;
+.card__city-name {
+
 }
 
-#weather td, #weather th {
-  border: none;
-  padding: 8px;
-  color: $dark-base-color;
+.card__chart {
+  max-width: 600px;
 }
-
-#weather tr:nth-child(even) {
-  background-color: $dark-bg-color;
-}
-
-#weather tr:hover td, tr:focus td {
-  color: $hover-yellow-color;
-}
-
-#weather th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: center;
-  color: $white-color;
-}
-
 </style>

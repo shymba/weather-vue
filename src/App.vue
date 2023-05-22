@@ -8,6 +8,9 @@
   padding: 0;
   box-sizing: border-box;
 }
+body {
+  background-color: #d7ceda;
+}
 
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -16,7 +19,6 @@
   text-align: center;
   color: #53708d;
   background-color: #d7ceda;
-  height: 100vh;
 }
 
 </style>

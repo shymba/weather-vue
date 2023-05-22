@@ -5,25 +5,22 @@ export default class ApiService {
 
     async getCitiesList(city) {
         const response = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=5&appid=${this._apiKey}`)
-        // const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${this._apiKey}`)
                             .then((res) => res.json())
-        console.log(response);
+        // console.log('getCitiesList', response);
         return response
     }
 
     async getOneCity(lat, lon) {
-        // const response = await fetch(`${this._apiBase}`).then((res) => res.json())
-        // const response = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=5&appid=${this._apiKey}`)
         const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${this._apiKey}&units=metric`)
             .then((res) => res.json())
-        console.log(response);
+        // console.log('getOneCity', response);
         return response
     }
 
     async getHourlyForecastData(lat, lon) {
         const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${this._apiKey}&units=metric`)
                         .then((res) => res.json())
-        console.log(response);
+        // console.log(response);
         return response
     }
 
